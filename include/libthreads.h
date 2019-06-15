@@ -5,12 +5,10 @@
 
 #define TIMESLICE 10000
 
-void scheduler(int event);
-int Init();
+void scheduler(int event); //Da el acomodo a los cpus
+int Init(); 
 int CreateThread(void  *function, void *parameters);
 int GetTid();
 int WaitThread(int t);
 void EndThread(int retstat);
 void Sleep(int units);
-
-
