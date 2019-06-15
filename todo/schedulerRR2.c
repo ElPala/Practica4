@@ -13,7 +13,7 @@ void scheduler(int arguments)
 	int old,next;
 	int changethread=0;
 	int waitingthread=0;
-	
+
 	int event=arguments & 0xFF00;
 	int callingthread=arguments & 0xFF;
 
@@ -22,14 +22,15 @@ void scheduler(int arguments)
 		// Un nuevo hilo va a la cola de listos
 		threads[callingthread].status=READY;
 		_enqueue(&ready,callingthread);
+		_enqueue(&ready,callingthread);
+		//_enqueue(&ready,callingthread);
 	}
-	
+
 	if(event==BLOCKTHREAD)
 	{
 
 		threads[callingthread].status=BLOCKED;
 		_enqueue(&waitinginevent[blockevent],callingthread);
-
 		changethread=1;
 	}
 
@@ -38,21 +39,39 @@ void scheduler(int arguments)
 		threads[callingthread].status=END;
 		changethread=1;
 	}
-	
+
 	if(event==UNBLOCKTHREAD)
 	{
 			threads[callingthread].status=READY;
 			_enqueue(&ready,callingthread);
-	}
+			_enqueue(&ready,callingthread);
 
-	
-	if(changethread)
-	{
+	}
+	if(changethread){
 		old=currthread;
 		next=_dequeue(&ready);
-		
-		threads[next].status=RUNNING;
-		_swapthreads(old,next);
+		if(old!=next){
+			threads[next].status=RUNNING;
+			_swapthreads(old,next);
+		}else{
+			next=_dequeue(&ready);
+			threads[next].status=RUNNING;
+			_swapthreads(old,next);
+		}
+	}else{
+		old=currthread;
+		next=_dequeue(&ready);
+		if(old!=next){
+			_enqueue(&ready,old);
+			_enqueue(&ready,old);
+			threads[next].status=RUNNING;
+			_swapthreads(old,next);
+		}
 	}
 
+}
+
+void errase (QUEUE *q , int val){
+		int head = q->head;
+		int tail = q->tail;
 }
