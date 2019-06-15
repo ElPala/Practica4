@@ -20,15 +20,17 @@ void scheduler(int arguments)
 
 	if(event==NEWTHREAD)
 	{
+		//printf("llamada:%d actual:%d q:%d nuevo\n",callingthread, currthread,q );
 		_enqueue(&ready,callingthread);
 		_enqueue(&ready,callingthread);
+
 		// Un nuevo hilo va a la cola de listos
 		threads[callingthread].status=READY;
 	}
 
 	if(event==BLOCKTHREAD)
 	{
-		//printf("llamada:%d actual:%d BLOQUEADO\n",callingthread, currthread );
+		//printf("llamada:%d actual:%d q:%d  BLOQUEADO\n",callingthread, currthread,q );
 		threads[callingthread].status=BLOCKED;
 		_enqueue(&waitinginevent[blockevent],callingthread);
 		changethread=1;
@@ -58,11 +60,12 @@ void scheduler(int arguments)
 
 
 	if(changethread){
+
 		while(old==next){
 			next=_dequeue(&ready);
 		}
-		q=0;
 		if(!_emptyq(&ready)){
+			q=0;
 			threads[next].status=RUNNING;
 			_swapthreads(old,next);
 		}
