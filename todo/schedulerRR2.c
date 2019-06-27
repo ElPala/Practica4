@@ -1,5 +1,5 @@
 #include <scheduler.h>
-
+#include <stdio.h>
 extern THANDLER threads[MAXTHREAD];
 extern int currthread;
 extern int blockevent;
@@ -7,7 +7,8 @@ extern int unblockevent;
 
 QUEUE ready;
 QUEUE waitinginevent[MAXTHREAD];
-
+int q=0;
+int bool;
 void scheduler(int arguments)
 {
 	int old,next;
@@ -19,16 +20,17 @@ void scheduler(int arguments)
 
 	if(event==NEWTHREAD)
 	{
+		//printf("llamada:%d actual:%d q:%d nuevo\n",callingthread, currthread,q );
+		_enqueue(&ready,callingthread);
+		_enqueue(&ready,callingthread);
+
 		// Un nuevo hilo va a la cola de listos
 		threads[callingthread].status=READY;
-		_enqueue(&ready,callingthread);
-		_enqueue(&ready,callingthread);
-		//_enqueue(&ready,callingthread);
 	}
 
 	if(event==BLOCKTHREAD)
 	{
-
+		//printf("llamada:%d actual:%d q:%d  BLOQUEADO\n",callingthread, currthread,q );
 		threads[callingthread].status=BLOCKED;
 		_enqueue(&waitinginevent[blockevent],callingthread);
 		changethread=1;
@@ -42,36 +44,49 @@ void scheduler(int arguments)
 
 	if(event==UNBLOCKTHREAD)
 	{
+	//printf("llamada:%d actual: %d DESBLOQUEADO\n",callingthread, currthread );
+		_enqueue(&ready,callingthread);
+		_enqueue(&ready,callingthread);
 			threads[callingthread].status=READY;
-			_enqueue(&ready,callingthread);
-			_enqueue(&ready,callingthread);
+
 
 	}
+
+	old=currthread;
+	if(_emptyq(&ready)){
+		return;
+	}
+	next=_dequeue(&ready);
+
+
 	if(changethread){
-		old=currthread;
-		next=_dequeue(&ready);
-		if(old!=next){
-			threads[next].status=RUNNING;
-			_swapthreads(old,next);
-		}else{
+
+		while(old==next){
 			next=_dequeue(&ready);
+		}
+		if(!_emptyq(&ready)){
+			q=0;
 			threads[next].status=RUNNING;
 			_swapthreads(old,next);
 		}
+
 	}else{
-		old=currthread;
-		next=_dequeue(&ready);
-		if(old!=next){
+
+		if(old==next){
+			q++;
+			if(q==2){
+				q=0;
+				_enqueue(&ready,old);
+				_enqueue(&ready,old);
+			}
+		}else {
+			q=0;
 			_enqueue(&ready,old);
 			_enqueue(&ready,old);
 			threads[next].status=RUNNING;
 			_swapthreads(old,next);
+
 		}
 	}
 
-}
-
-void errase (QUEUE *q , int val){
-		int head = q->head;
-		int tail = q->tail;
 }
