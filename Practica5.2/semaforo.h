@@ -1,6 +1,6 @@
 
 #define MAXTHREAD 50
-#define CICLOS 10
+#define CICLOS 3
 
 
 typedef struct _QUEUE {
@@ -10,7 +10,7 @@ typedef struct _QUEUE {
 } QUEUE;
 
 typedef struct _semaforo {
-	QUEUE *stoped;
+	QUEUE stoped;
   int val;
 } semaforo;
 
